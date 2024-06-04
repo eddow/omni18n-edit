@@ -1,5 +1,5 @@
 <script lang="ts">
-	// TODO ajouter
+	// TODO ajouter renommer(clef) effacer
 	// TODO comparer aux chaines existantes pour dup
 	// TODO le filtre se barre sous la toolbar
 	import '$lib'
@@ -40,7 +40,13 @@
 			newLocales.some((l, i) => l !== lastSetLocales[i])
 		) {
 			lastSetLocales = newLocales
-			context.set({ db, locales: locales.filter((l) => config[l]) })
+			context.set({
+				db,
+				locales: locales.filter((l) => config[l]),
+				setCreating(creating: () => void) {
+					add = creating
+				}
+			})
 		}
 	})
 	let fileInput: HTMLInputElement
@@ -79,7 +85,7 @@
 		window.URL.revokeObjectURL(url)
 		dirty.set(false)
 	}
-	function add() {}
+	let add: (() => void) | undefined = $state(undefined)
 	dirty.subscribe((d) => {
 		if (typeof window !== 'undefined')
 			window.onbeforeunload = d ? () => 'Changes have been made and not saved.' : null
@@ -104,7 +110,7 @@
 <TopAppBar color="primary" variant="fixed" bind:this={topAppBar}>
 	<Row>
 		<Section>
-			<IconButton class="material-icons" onclick={add}>add</IconButton>
+			<IconButton disabled={!add} class="material-icons" onclick={add}>add</IconButton>
 		</Section>
 		<Section align="end">
 			{#if locales.length}
