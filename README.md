@@ -6,9 +6,22 @@ Static webapp to edit [OmnI18n](https://www.npmjs.com/package/omni18n) [FileDB](
 
 Just browse [./build/index.html](./build/index.html)
 
-I'll find a way to make packages on github
+The built files are released on github
 
-I'll make an electron version when I have time
+### Functionning
+
+It's really just a CRUD engine.
+
+Make sure your dictionary file begins with a list of locales
+
+```
+#{locales: ['en','fr','de']}
+
+```
+
+After, open the file (buttons in the toolbar) and configure the languages you wish to edit
+
+Add/remove/modify, then download the modified dictionary file (other button in the toolbar)
 
 ## Development
 
