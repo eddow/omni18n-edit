@@ -1,7 +1,6 @@
 <script lang="ts">
-	// TODO ajouter renommer(clef) effacer
-	// TODO comparer aux chaines existantes pour dup
-	// TODO le filtre se barre sous la toolbar
+	// TODO Compare strings with some distance to avoid duplicates
+	// TODO Filters get under the toolbar
 	import '$lib'
 	import { MemDB, localeFlags, serialization, type Locale } from 'omni18n/ts/s-a'
 	import TopAppBar, { Row, Section, Title, AutoAdjust } from '@smui/top-app-bar'

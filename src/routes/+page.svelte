@@ -43,18 +43,21 @@
 		dirty.set(true)
 	}
 	async function renameKey() {
-		if (editing === newName || !newName) return
-		if (workDictionary.find((w) => w.key === newName)) return
+		if (editing === newName) return showSnack('Identical the key')
+		if (!newName) return showSnack('No key')
+		if (workDictionary.find((w) => w.key === newName)) return showSnack('Key already exists')
 		await db?.reKey(editing!, newName)
 		workDictionary.find((w) => w.key === editing)!.key = newName
 		editing = undefined
+		isEditing = false
 		dirty.set(true)
 	}
 	async function deleteKey() {
-		if (!deleting) return
+		if (!deleting) return showSnack('No key')
 		await db?.reKey(deleting!)
 		workDictionary = workDictionary.filter((w) => w.key !== deleting)
 		deleting = undefined
+		isDeleting = false
 		dirty.set(true)
 	}
 	function initCreating() {
@@ -63,7 +66,7 @@
 		for (const l of locales) newEntry[l] = ''
 	}
 	async function createKey() {
-		if (!newEntry.key) return
+		if (!newEntry.key) return showSnack('No key')
 		await db?.key(newEntry!.key, '')
 		await Promise.all(
 			locales.filter((l) => newEntry![l]).map((l) => save(newEntry!.key, l, newEntry![l]))
@@ -81,41 +84,45 @@
 		dirty.set(true)
 	}
 	let deleting: string | undefined = $state(undefined),
+		isDeleting = $state(false),
 		editing: string | undefined = $state(undefined),
+		isEditing = $state(false),
 		newName = $state(''),
 		creating = $state(false),
 		newEntry: Record<'key' | Locale, string> = $state({}),
 		snackMessage = $state(''),
 		snackbarError: Snackbar | null = null
+	function showSnack(message: string) {
+		snackMessage = message
+		snackbarError?.open()
+	}
 </script>
 
 <Snackbar bind:this={snackbarError} class="demo-error">
 	<Label>{snackMessage}</Label>
 	<Actions>
-		<IconButton class="material-icons" title="Dismiss">close</IconButton>
+		<IconButton class="material-icons" title="Dismiss" onclick={() => snackbarError?.close()}
+			>close</IconButton
+		>
 	</Actions>
 </Snackbar>
-<Dialog
-	onkeyup={(e) => e.key === 'Enter' && deleteKey()}
-	open={!!deleting}
-	onclose={() => (deleting = undefined)}
->
+<Dialog onkeyup={(e) => e.key === 'Enter' && deleteKey()} bind:open={isDeleting}>
 	<Content>
 		Are you sure you want to delete <pre>{deleting}</pre>
 		?
 	</Content>
 	<Actions>
-		<IconButton color="secondary" class="material-icons" onclick={() => (deleting = undefined)}>
+		<IconButton
+			color="secondary"
+			class="material-icons"
+			onclick={() => ((deleting = undefined), (isDeleting = false))}
+		>
 			close
 		</IconButton>
 		<IconButton color="primary" class="material-icons" onclick={deleteKey}>delete</IconButton>
 	</Actions>
 </Dialog>
-<Dialog
-	onkeyup={(e) => e.key === 'Enter' && renameKey()}
-	open={!!editing}
-	onclose={() => (editing = undefined)}
->
+<Dialog onkeyup={(e) => e.key === 'Enter' && renameKey()} bind:open={isEditing}>
 	<Content>
 		New name for <pre>{editing}</pre>
 		<br />
@@ -188,18 +195,23 @@
 								class="material-icons on-cell-hover"
 								onclick={() => {
 									deleting = key
+									isDeleting = true
 								}}
 							>
 								delete
 							</IconButton>
 							<IconButton
 								class="material-icons on-cell-hover"
-								onclick={() => (editing = newName = key)}
+								onclick={() => {
+									editing = newName = key
+									isEditing = true
+								}}
 							>
 								edit
 							</IconButton>
 							{key}
-						</Cell>{/if}
+						</Cell>
+					{/if}
 					<Cell>{flags[locale]}</Cell>
 					<TextEdit bind:value={texts[locale]} onsave={(text) => save(key, locale, text)} />
 				</Row>
@@ -212,6 +224,9 @@
 	:global(table.fit) {
 		:global(.key) {
 			background-color: lightgrey;
+		}
+		:global(input) {
+			min-width: 150px;
 		}
 	}
 	:global(.material-icon.on-cell-hover),

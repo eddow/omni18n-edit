@@ -1,5 +1,5 @@
+//import '@smui/svelte-material-ui/themes/bubblegum-dark.css'
 import '@smui/svelte-material-ui/bare.css'
-import '@smui/svelte-material-ui/themes/svelte-dark.css'
 import '@smui/top-app-bar/bare.css'
 import '@smui/icon-button/bare.css'
 import '@smui/paper/bare.css'
