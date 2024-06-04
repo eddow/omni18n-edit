@@ -6,7 +6,7 @@ Static webapp to edit [OmnI18n](https://www.npmjs.com/package/omni18n) [FileDB](
 
 Just browse [./build/index.html](./build/index.html)
 
-The built files are released on github
+The bundled files are released on [github](https://github.com/eddow/omni18n-edit/releases)
 
 ### Functionning
 
