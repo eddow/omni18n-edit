@@ -5,6 +5,7 @@
 	import { MemDB, localeFlags, serialization, type Locale } from 'omni18n/ts/s-a'
 	import TopAppBar, { Row, Section, Title, AutoAdjust } from '@smui/top-app-bar'
 	import IconButton from '@smui/icon-button'
+	import FormField from '@smui/form-field'
 	import Paper from '@smui/paper'
 	import Dialog, { Content, Actions } from '@smui/dialog'
 	import List, { Item } from '@smui/list'
@@ -13,22 +14,28 @@
 	import type { DbContext } from '$lib/types'
 	import { writable, type Readable, type Writable } from 'svelte/store'
 
-	let config: Record<Locale, boolean> = $state(
+	let config: Record<Locale | 'dev', boolean> = $state(
 		(typeof window !== 'undefined' && JSON.parse(window.localStorage.getItem('locales') || '{}')) ||
 			{}
 	)
+	if (!config.dev) config.dev = false
 	let flags: Record<string, string> = {},
 		fileName = '',
 		configure = $state(false),
 		{ children } = $props(),
-		db = new MemDB(),
+		db = new MemDB<FileI18n.KeyInfos>(),
 		locales: Locale[] = $state([]),
 		context = writable<DbContext>(),
 		lastSetLocales: Locale[] = [],
 		topAppBar: TopAppBar | null = $state(null),
-		dirty = writable(false)
+		dirty = writable(false),
+		dev = writable(!!config.dev)
 	setContext<Readable<DbContext>>('db', context)
 	setContext<Writable<boolean>>('dirty', dirty)
+	setContext<Writable<boolean>>('dev', dev)
+	$effect(() => {
+		dev.set(config.dev)
+	})
 	$effect(() => {
 		for (const l of locales) if (config[l] !== false) config[l] = true
 		if (typeof window !== 'undefined')
@@ -109,7 +116,9 @@
 <TopAppBar color="primary" variant="fixed" bind:this={topAppBar}>
 	<Row>
 		<Section>
-			<IconButton disabled={!add} class="material-icons" onclick={add}>add</IconButton>
+			{#if $dev}
+				<IconButton disabled={!add} class="material-icons" onclick={add}>add</IconButton>
+			{/if}
 		</Section>
 		<Section align="end">
 			{#if locales.length}
@@ -122,20 +131,34 @@
 </TopAppBar>
 <Dialog bind:open={configure} aria-labelledby="simple-title" aria-describedby="simple-content">
 	<!-- Title cannot contain leading whitespace due to mdc-typography-baseline-top() -->
-	<Title id="simple-title">Use languages</Title>
+	<Title id="simple-title">Use languages/features</Title>
 	<Content id="simple-content">
-		{#each locales as l}
-			<List>
+		<List>
+			<Item>
+				<FormField>
+					<Checkbox bind:checked={config.dev} />
+					<span slot="label">I'm a developer</span>
+				</FormField>
+			</Item>
+			{#each locales as l}
 				<Item>
-					<Checkbox bind:checked={config[l]} />{flags[l]}
+					<FormField>
+						<Checkbox bind:checked={config[l]} />
+						<span slot="label">{flags[l]}</span>
+					</FormField>
 				</Item>
-			</List>
-		{/each}
+			{/each}
+		</List>
 	</Content>
 </Dialog>
 <AutoAdjust {topAppBar}>
 	{#if !locales.length}
-		<Paper color="error">No locales defined</Paper>
+		<Paper color="error">
+			<p>No locales defined.</p>
+			<p>Open a database and make sure it has some locales defines.</p>
+			<p>The first line should resemble:</p>
+			<pre>#&lbrace;locales: ['en','de']&rbrace;</pre>
+		</Paper>
 	{:else}
 		{@render children()}
 	{/if}

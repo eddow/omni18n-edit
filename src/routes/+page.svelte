@@ -12,10 +12,14 @@
 	import Snackbar, { Label } from '@smui/snackbar'
 
 	const context = getContext<Readable<DbContext>>('db'),
-		dirty = getContext<Writable<boolean>>('dirty')
-	let { locales, db } = $state({ locales: <Locale[]>[], db: <MemDB | null>null }),
+		dirty = getContext<Writable<boolean>>('dirty'),
+		dev = getContext<Readable<boolean>>('dev')
+	let { locales, db } = $state({
+			locales: <Locale[]>[],
+			db: <MemDB<FileI18n.KeyInfos> | null>null
+		}),
 		flags: Record<string, string> = {},
-		workDictionary: WorkDictionary = $state([]),
+		workDictionary: WorkDictionary<FileI18n.KeyInfos> = $state([]),
 		filters: Record<string, string> = $state({ key: '', locale: '', text: '' })
 	context.subscribe((c) => {
 		if (c) {
@@ -26,7 +30,7 @@
 			c.setCreating(initCreating)
 		}
 	})
-	let filteredDictionary: WorkDictionary = $derived(
+	let filteredDictionary: WorkDictionary<FileI18n.KeyInfos> = $derived(
 		workDictionary.filter(
 			({ key, texts }) =>
 				key[0] !== '.' &&
@@ -186,36 +190,40 @@
 		</Row>
 	</Head>
 	<Body>
-		{#each filteredDictionary as { key, texts }}
-			{#each locales as locale, i}
-				<Row>
-					{#if i === 0}
-						<Cell rowspan={locales.length} class="key">
-							<IconButton
-								class="material-icons on-cell-hover"
-								onclick={() => {
-									deleting = key
-									isDeleting = true
-								}}
-							>
-								delete
-							</IconButton>
-							<IconButton
-								class="material-icons on-cell-hover"
-								onclick={() => {
-									editing = newName = key
-									isEditing = true
-								}}
-							>
-								edit
-							</IconButton>
-							{key}
-						</Cell>
-					{/if}
-					<Cell>{flags[locale]}</Cell>
-					<TextEdit bind:value={texts[locale]} onsave={(text) => save(key, locale, text)} />
-				</Row>
-			{/each}
+		{#each filteredDictionary as { key, texts, infos }}
+			{#if !infos?.inFileOnly}
+				{#each locales as locale, i}
+					<Row>
+						{#if i === 0}
+							<Cell rowspan={locales.length} class="key">
+								{#if $dev}
+									<IconButton
+										class="material-icons on-cell-hover"
+										onclick={() => {
+											deleting = key
+											isDeleting = true
+										}}
+									>
+										delete
+									</IconButton>
+									<IconButton
+										class="material-icons on-cell-hover"
+										onclick={() => {
+											editing = newName = key
+											isEditing = true
+										}}
+									>
+										edit
+									</IconButton>
+								{/if}
+								{key}
+							</Cell>
+						{/if}
+						<Cell>{flags[locale]}</Cell>
+						<TextEdit bind:value={texts[locale]} onsave={(text) => save(key, locale, text)} />
+					</Row>
+				{/each}
+			{/if}
 		{/each}
 	</Body>
 </DataTable>

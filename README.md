@@ -26,3 +26,22 @@ Add/remove/modify, then download the modified dictionary file (other button in t
 ## Development
 
 In order to develop (who would do that?), `svelte-material-ui` has a svelte5-ready version as `@next` (in branch `v8`), so it has to be cloned, branched and compiled locally (hence the `"devDependencies"` entry `"svelte-material-ui-dev": "file:../svelte-material-ui"`)
+
+# Used `infos`
+
+`OmnI18n` allows `KeyInfos` and `TextInfos`. These, in a file, are inserted between the key/locale and its `:` between `{` and `}` describing an object in a js-like format
+
+Ex:
+
+```
+format.lists{inFileOnly:true}:
+	:{list::$1|style:long, type:conjunction}
+```
+
+## KeyInfos
+
+- `inFileOnly` (`boolean, default=false`): means it shouldn't appear in the translatable list as it is a technical translation
+
+## TextInfos
+
+void
