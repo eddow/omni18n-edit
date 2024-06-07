@@ -4,7 +4,9 @@ Static webapp to edit [OmnI18n](https://www.npmjs.com/package/omni18n) [FileDB](
 
 ## Usage
 
-Just browse [./build/index.html](./build/index.html)
+You need to have a static server ! (If someone knows some, please PR here in README.md). The files are static but cannot come from the file system.
+
+Just browse [`./build/index.html`](./build/index.html) with a root folder configure in `./build/`
 
 The bundled files are released on [github](https://github.com/eddow/omni18n-edit/releases)
 
@@ -31,10 +33,9 @@ In order to develop (who would do that?), `svelte-material-ui` has a svelte5-rea
 
 `OmnI18n` allows `KeyInfos` and `TextInfos`. These, in a file, are inserted between the key/locale and its `:` between `{` and `}` describing an object in a js-like format
 
-Ex:
-
+Example:
 ```
-format.lists{inFileOnly:true}:
+format.list.and{inFileOnly:true}:
 	:{list::$1|style:long, type:conjunction}
 ```
 

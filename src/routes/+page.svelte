@@ -153,7 +153,7 @@
 			<Body>
 				{#each locales as locale}
 					<Row>
-						<Cell>{flags[locale]}</Cell>
+						<Cell>{@html flags[locale]}</Cell>
 						<Cell>
 							<Input bind:value={newEntry[locale]} />
 						</Cell>
@@ -179,7 +179,7 @@
 				<List>
 					{#each locales as locale}
 						<Item activated={filters.locale === locale} onclick={() => (filters.locale = locale)}>
-							{flags[locale]}
+							{@html flags[locale]}
 						</Item>
 					{/each}
 				</List>
@@ -219,7 +219,7 @@
 								{key}
 							</Cell>
 						{/if}
-						<Cell>{flags[locale]}</Cell>
+						<Cell>{@html flags[locale]}</Cell>
 						<TextEdit bind:value={texts[locale]} onsave={(text) => save(key, locale, text)} />
 					</Row>
 				{/each}
