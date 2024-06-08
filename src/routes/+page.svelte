@@ -2,7 +2,7 @@
 	import IconButton from '@smui/icon-button'
 	import type { DbContext } from '$lib/types'
 	import { getContext } from 'svelte'
-	import { MemDB, localeFlags, type Locale, type WorkDictionary } from 'omni18n/ts/s-a'
+	import { MemDB, localeFlagsEngine, type Locale, type WorkDictionary } from 'omni18n/ts/s-a'
 	import DataTable, { Body, Head, Row, Cell } from '@smui/data-table'
 	import type { Readable, Writable } from 'svelte/store'
 	import Textfield, { Input } from '@smui/textfield'
@@ -11,6 +11,7 @@
 	import Dialog, { Actions, Content } from '@smui/dialog'
 	import Snackbar, { Label } from '@smui/snackbar'
 
+	const localeFlags = localeFlagsEngine()
 	const context = getContext<Readable<DbContext>>('db'),
 		dirty = getContext<Writable<boolean>>('dirty'),
 		dev = getContext<Readable<boolean>>('dev')

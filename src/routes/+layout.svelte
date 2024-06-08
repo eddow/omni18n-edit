@@ -2,7 +2,7 @@
 	// TODO Compare strings with some distance to avoid duplicates
 	// TODO Filters get under the toolbar
 	import '$lib'
-	import { MemDB, localeFlags, serialization, type Locale } from 'omni18n/ts/s-a'
+	import { MemDB, localeFlagsEngine, serialization, type Locale } from 'omni18n/ts/s-a'
 	import TopAppBar, { Row, Section, Title, AutoAdjust } from '@smui/top-app-bar'
 	import IconButton from '@smui/icon-button'
 	import FormField from '@smui/form-field'
@@ -14,6 +14,7 @@
 	import type { DbContext } from '$lib/types'
 	import { writable, type Readable, type Writable } from 'svelte/store'
 
+	const localeFlags = localeFlagsEngine()
 	let config: Record<Locale | 'dev', boolean> = $state(
 		(typeof window !== 'undefined' && JSON.parse(window.localStorage.getItem('locales') || '{}')) ||
 			{}
@@ -144,7 +145,7 @@
 				<Item>
 					<FormField>
 						<Checkbox bind:checked={config[l]} />
-						<span slot="label">{flags[l]}</span>
+						<span slot="label">{@html flags[l]}</span>
 					</FormField>
 				</Item>
 			{/each}
